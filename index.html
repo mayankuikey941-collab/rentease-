@@ -1,1 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RentEase - Rent Management</title>
+  <link rel="stylesheet" href="style.css">
+</head>
 
+<body>
+
+  <div class="app">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo">
+        <div class="logo-icon">🏠</div>
+        <div>
+          <h2>RentEase</h2>
+          <p>Smart Rent Management</p>
+        </div>
+      </div>
+
+      <nav>
+        <button class="nav-item active" data-page="dashboard">
+          📊 Dashboard
+        </button>
+
+        <button class="nav-item" data-page="properties">
+          🏢 Properties
+        </button>
+
+        <button class="nav-item" data-page="tenants">
+          👥 Tenants
+        </button>
+
+        <button class="nav-item" data-page="payments">
+          💳 Payments
+        </button>
+
+        <button class="nav-item" data-page="maintenance">
+          🔧 Maintenance
+        </button>
+
+        <button class="nav-item" data-page="reports">
+          📈 Reports
+        </button>
+
+        <button class="nav-item" data-page="settings">
+          ⚙️ Settings
+        </button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <b>Premium Plan</b>
+        <p>Manage unlimited properties</p>
+        <button>Upgrade Plan</button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main-content">
+
+      <!-- Mobile Header -->
+      <header class="topbar">
+        <button id="menuBtn" class="menu-btn">☰</button>
+
+        <h2 id="pageTitle">Dashboard</h2>
+
+        <div class="profile">A</div>
+      </header>
+
+      <div class="content">
+
+        <!-- Dashboard -->
+        <section id="dashboard" class="page active-page">
+
+          <div class="page-header">
+            <div>
+              <h1>Welcome back, Admin 👋</h1>
+              <p>Manage your properties and rent payments.</p>
+            </div>
+
+            <button class="primary-btn" id="addPropertyBtn">
+              + Add Property
+            </button>
+          </div>
+
+          <div class="stats">
+
+            <div class="stat-card">
+              <div class="stat-icon">₹</div>
+              <p>Monthly Income</p>
+              <h2 id="income">₹0</h2>
+              <span>Collected rent</span>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon">⏳</div>
+              <p>Pending Rent</p>
+              <h2 id="pending">₹0</h2>
+              <span>Awaiting payment</span>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon">🏢</div>
+              <p>Total Properties</p>
+              <h2 id="propertyCount">0</h2>
+              <span>Your properties</span>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon">👥</div>
+              <p>Total Tenants</p>
+              <h2 id="tenantCount">0</h2>
+              <span>Registered tenants</span>
+            </div>
+
+          </div>
+
+          <div class="section-header">
+            <h2>My Properties</h2>
+            <button onclick="openPage('properties')">
+              View All
+            </button>
+          </div>
+
+          <div id="dashboardProperties" class="property-grid"></div>
+
+          <div class="section-header">
+            <h2>Recent Tenants</h2>
+
+            <button class="primary-btn" id="addTenantBtn">
+              + Add Tenant
+            </button>
+          </div>
+
+          <div class="table-box">
+            <table>
+              <thead>
+                <tr>
+                  <th>Tenant</th>
+                  <th>Room</th>
+                  <th>Rent</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+
+              <tbody id="dashboardTenants"></tbody>
+            </table>
+          </div>
+
+        </section>
+
+        <!-- Properties -->
+        <section id="properties" class="page">
+
+          <div class="page-header">
+            <div>
+              <h1>Properties</h1>
+              <p>Manage all your properties.</p>
+            </div>
+
+            <button class="primary-btn" onclick="openPropertyModal()">
+              + Add Property
+            </button>
+          </div>
+
+          <div id="propertiesList" class="property-grid"></div>
+
+        </section>
+
+        <!-- Tenants -->
+        <section id="tenants" class="page">
+
+          <div class="page-header">
+            <div>
+              <h1>Tenants</h1>
+              <p>Manage tenant records.</p>
+            </div>
+
+            <button class="primary-btn" onclick="openTenantModal()">
+              + Add Tenant
+            </button>
+          </div>
+
+          <div class="table-box">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Room</th>
+                  <th>Rent</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+
+              <tbody id="tenantsList"></tbody>
+            </table>
+          </div>
+
+        </section>
+
+        <!-- Payments -->
+        <section id="payments" class="page">
+
+          <h1>Payments</h1>
+          <p>Track all rent payments.</p>
+
+          <div class="payment-summary">
+
+            <div class="summary-card">
+              <h3 id="paidCount">0</h3>
+              <p>Paid</p>
+            </div>
+
+            <div class="summary-card">
+              <h3 id="pendingCount">0</h3>
+              <p>Pending</p>
+            </div>
+
+            <div class="summary-card">
+              <h3 id="overdueCount">0</h3>
+              <p>Overdue</p>
+            </div>
+
+          </div>
+
+        </section>
+
+        <!-- Maintenance -->
+        <section id="maintenance" class="page">
+
+          <h1>Maintenance Requests</h1>
+          <p>Track maintenance issues.</p>
+
+          <div class="maintenance-grid">
+
+            <div class="maintenance-card">
+              <div class="maintenance-top">
+                <span>🔧</span>
+                <b class="pending-badge">Open</b>
+              </div>
+
+              <h3>Water Leakage</h3>
+              <p>Room: A-101</p>
+              <button>View Request</button>
+            </div>
+
+            <div class="maintenance-card">
+              <div class="maintenance-top">
+                <span>⚡</span>
+                <b class="pending-badge">In Progress</b>
+              </div>
+
+              <h3>Electricity Issue</h3>
+              <p>Room: B-202</p>
+              <button>View Request</button>
+            </div>
+
+          </div>
+
+        </section>
+
+        <!-- Reports -->
+        <section id="reports" class="page">
+
+          <h1>Reports & Analytics</h1>
+
+          <div class="stats">
+
+            <div class="stat-card">
+              <div class="stat-icon">📈</div>
+              <p>Monthly Collection</p>
+              <h2 id="reportIncome">₹0</h2>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon">🏢</div>
+              <p>Occupancy Rate</p>
+              <h2 id="occupancy">0%</h2>
+            </div>
+
+          </div>
+
+        </section>
+
+        <!-- Settings -->
+        <section id="settings" class="page">
+
+          <h1>Settings</h1>
+
+          <div class="settings-box">
+
+            <label>Business Name</label>
+
+            <input
+              type="text"
+              value="RentEase Properties"
+            >
+
+            <button class="primary-btn">
+              Save Changes
+            </button>
+
+          </div>
+
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Property Modal -->
+  <div id="propertyModal" class="modal">
+
+    <div class="modal-box">
+
+      <div class="modal-header">
+        <h2>Add New Property</h2>
+        <button onclick="closePropertyModal()">✕</button>
+      </div>
+
+      <form id="propertyForm">
+
+        <input
+          id="propertyName"
+          placeholder="Property Name"
+          required
+        >
+
+        <input
+          id="propertyLocation"
+          placeholder="Location"
+          required
+        >
+
+        <input
+          id="propertyRooms"
+          type="number"
+          placeholder="Number of Rooms"
+          required
+        >
+
+        <button class="primary-btn">
+          Add Property
+        </button>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- Tenant Modal -->
+  <div id="tenantModal" class="modal">
+
+    <div class="modal-box">
+
+      <div class="modal-header">
+        <h2>Add New Tenant</h2>
+        <button onclick="closeTenantModal()">✕</button>
+      </div>
+
+      <form id="tenantForm">
+
+        <input
+          id="tenantName"
+          placeholder="Tenant Name"
+          required
+        >
+
+        <input
+          id="tenantRoom"
+          placeholder="Room Number"
+          required
+        >
+
+        <input
+          id="tenantRent"
+          type="number"
+          placeholder="Monthly Rent"
+          required
+        >
+
+        <button class="primary-btn">
+          Add Tenant
+        </button>
+
+      </form>
+
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+
+</body>
+</html>
