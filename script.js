@@ -46,14 +46,23 @@ let tenants = JSON.parse(localStorage.getItem("tenants")) || [
   }
 ];
 
+
+/* SAVE DATA */
+
 function saveData() {
   localStorage.setItem("properties", JSON.stringify(properties));
   localStorage.setItem("tenants", JSON.stringify(tenants));
 }
 
+
+/* MONEY FORMAT */
+
 function formatMoney(amount) {
   return "₹" + Number(amount).toLocaleString("en-IN");
 }
+
+
+/* RENDER DASHBOARD */
 
 function renderDashboard() {
 
@@ -100,6 +109,9 @@ function renderDashboard() {
   renderPaymentSummary();
 }
 
+
+/* RENDER PROPERTIES */
+
 function renderProperties() {
 
   let dashboard = document.getElementById(
@@ -123,7 +135,20 @@ function renderProperties() {
     html += `
       <div class="property-card">
 
-        <div style="font-size:30px">🏢</div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+
+          <div style="font-size:30px">
+            🏢
+          </div>
+
+          <button
+            class="action-btn delete-btn"
+            onclick="deleteProperty(${property.id})"
+          >
+            🗑 Delete
+          </button>
+
+        </div>
 
         <h3>${property.name}</h3>
 
@@ -156,14 +181,43 @@ function renderProperties() {
   list.innerHTML = html;
 }
 
+
+/* DELETE PROPERTY */
+
+function deleteProperty(id) {
+
+  let confirmDelete =
+    confirm("Are you sure you want to delete this property?");
+
+  if (!confirmDelete) return;
+
+  properties = properties.filter(
+    property => property.id !== id
+  );
+
+  saveData();
+
+  renderDashboard();
+}
+
+
+/* STATUS COLOR */
+
 function getStatusClass(status) {
 
-  if (status === "Paid") return "paid";
+  if (status === "Paid") {
+    return "paid";
+  }
 
-  if (status === "Pending") return "pending";
+  if (status === "Pending") {
+    return "pending";
+  }
 
   return "overdue";
 }
+
+
+/* RENDER TENANTS */
 
 function renderTenants() {
 
@@ -184,19 +238,28 @@ function renderTenants() {
       getStatusClass(tenant.status);
 
     if (index < 5) {
+
       dashboardHtml += `
         <tr>
+
           <td>${tenant.name}</td>
+
           <td>${tenant.room}</td>
-          <td>${formatMoney(tenant.rent)}</td>
+
+          <td>
+            ${formatMoney(tenant.rent)}
+          </td>
+
           <td>
             <span class="status ${statusClass}">
               ${tenant.status}
             </span>
           </td>
+
         </tr>
       `;
     }
+
 
     tenantHtml += `
       <tr>
@@ -205,7 +268,9 @@ function renderTenants() {
 
         <td>${tenant.room}</td>
 
-        <td>${formatMoney(tenant.rent)}</td>
+        <td>
+          ${formatMoney(tenant.rent)}
+        </td>
 
         <td>
           <span class="status ${statusClass}">
@@ -222,7 +287,7 @@ function renderTenants() {
                   class="action-btn pay-btn"
                   onclick="markPaid(${tenant.id})"
                 >
-                  Paid
+                  ✓ Paid
                 </button>
               `
               : ""
@@ -232,7 +297,7 @@ function renderTenants() {
             class="action-btn delete-btn"
             onclick="deleteTenant(${tenant.id})"
           >
-            Delete
+            🗑 Delete
           </button>
 
         </td>
@@ -242,8 +307,54 @@ function renderTenants() {
   });
 
   dashboard.innerHTML = dashboardHtml;
+
   list.innerHTML = tenantHtml;
 }
+
+
+/* MARK TENANT PAID */
+
+function markPaid(id) {
+
+  tenants = tenants.map(tenant => {
+
+    if (tenant.id === id) {
+
+      return {
+        ...tenant,
+        status: "Paid"
+      };
+    }
+
+    return tenant;
+  });
+
+  saveData();
+
+  renderDashboard();
+}
+
+
+/* DELETE TENANT */
+
+function deleteTenant(id) {
+
+  let confirmDelete =
+    confirm("Are you sure you want to delete this tenant?");
+
+  if (!confirmDelete) return;
+
+  tenants = tenants.filter(
+    tenant => tenant.id !== id
+  );
+
+  saveData();
+
+  renderDashboard();
+}
+
+
+/* PAYMENT SUMMARY */
 
 function renderPaymentSummary() {
 
@@ -269,111 +380,78 @@ function renderPaymentSummary() {
     overdue;
 }
 
+
 /* ADD PROPERTY */
 
-document.getElementById("propertyForm")
-.addEventListener("submit", function(e) {
+document
+  .getElementById("propertyForm")
+  .addEventListener("submit", function(e) {
 
-  e.preventDefault();
+    e.preventDefault();
 
-  let name =
-    document.getElementById("propertyName").value;
+    let name =
+      document.getElementById("propertyName").value;
 
-  let location =
-    document.getElementById("propertyLocation").value;
+    let location =
+      document.getElementById("propertyLocation").value;
 
-  let rooms =
-    document.getElementById("propertyRooms").value;
+    let rooms =
+      document.getElementById("propertyRooms").value;
 
-  properties.push({
-    id: Date.now(),
-    name,
-    location,
-    rooms: Number(rooms),
-    occupied: 0
+    properties.push({
+      id: Date.now(),
+      name: name,
+      location: location,
+      rooms: Number(rooms),
+      occupied: 0
+    });
+
+    saveData();
+
+    renderDashboard();
+
+    this.reset();
+
+    closePropertyModal();
   });
-
-  saveData();
-
-  renderDashboard();
-
-  this.reset();
-
-  closePropertyModal();
-});
 
 
 /* ADD TENANT */
 
-document.getElementById("tenantForm")
-.addEventListener("submit", function(e) {
+document
+  .getElementById("tenantForm")
+  .addEventListener("submit", function(e) {
 
-  e.preventDefault();
+    e.preventDefault();
 
-  let name =
-    document.getElementById("tenantName").value;
+    let name =
+      document.getElementById("tenantName").value;
 
-  let room =
-    document.getElementById("tenantRoom").value;
+    let room =
+      document.getElementById("tenantRoom").value;
 
-  let rent =
-    document.getElementById("tenantRent").value;
+    let rent =
+      document.getElementById("tenantRent").value;
 
-  tenants.push({
-    id: Date.now(),
-    name,
-    room,
-    rent: Number(rent),
-    status: "Pending"
+    tenants.push({
+      id: Date.now(),
+      name: name,
+      room: room,
+      rent: Number(rent),
+      status: "Pending"
+    });
+
+    saveData();
+
+    renderDashboard();
+
+    this.reset();
+
+    closeTenantModal();
   });
 
-  saveData();
 
-  renderDashboard();
-
-  this.reset();
-
-  closeTenantModal();
-});
-
-
-/* TENANT ACTIONS */
-
-function markPaid(id) {
-
-  tenants = tenants.map(tenant => {
-
-    if (tenant.id === id) {
-      tenant.status = "Paid";
-    }
-
-    return tenant;
-  });
-
-  saveData();
-
-  renderDashboard();
-}
-
-
-function deleteTenant(id) {
-
-  let confirmDelete =
-    confirm("Delete this tenant?");
-
-  if (!confirmDelete) return;
-
-  tenants = tenants.filter(
-    tenant => tenant.id !== id
-  );
-
-  saveData();
-
-  renderDashboard();
-}
-
-
-/* MODALS */
+/* PROPERTY MODAL */
 
 function openPropertyModal() {
 
@@ -391,6 +469,8 @@ function closePropertyModal() {
 }
 
 
+/* TENANT MODAL */
+
 function openTenantModal() {
 
   document
@@ -406,6 +486,8 @@ function closeTenantModal() {
     .classList.remove("show");
 }
 
+
+/* BUTTON EVENTS */
 
 document
   .getElementById("addPropertyBtn")
@@ -423,19 +505,27 @@ document
   );
 
 
-/* NAVIGATION */
+/* PAGE NAVIGATION */
 
 function openPage(pageId) {
 
   document
     .querySelectorAll(".page")
     .forEach(page => {
-      page.classList.remove("active-page");
+
+      page.classList.remove(
+        "active-page"
+      );
+
     });
+
 
   document
     .getElementById(pageId)
-    .classList.add("active-page");
+    .classList.add(
+      "active-page"
+    );
+
 
   document
     .getElementById("pageTitle")
@@ -443,32 +533,53 @@ function openPage(pageId) {
     pageId.charAt(0).toUpperCase()
     + pageId.slice(1);
 
+
   document
     .querySelectorAll(".nav-item")
     .forEach(item => {
 
-      item.classList.remove("active");
+      item.classList.remove(
+        "active"
+      );
 
-      if (item.dataset.page === pageId) {
-        item.classList.add("active");
+      if (
+        item.dataset.page === pageId
+      ) {
+
+        item.classList.add(
+          "active"
+        );
+
       }
+
     });
+
 
   document
     .querySelector(".sidebar")
-    .classList.remove("show");
+    .classList.remove(
+      "show"
+    );
 }
 
+
+/* SIDEBAR BUTTONS */
 
 document
   .querySelectorAll(".nav-item")
   .forEach(item => {
 
-    item.addEventListener("click", () => {
+    item.addEventListener(
+      "click",
+      () => {
 
-      openPage(item.dataset.page);
+        openPage(
+          item.dataset.page
+        );
 
-    });
+      }
+    );
+
   });
 
 
@@ -476,15 +587,20 @@ document
 
 document
   .getElementById("menuBtn")
-  .addEventListener("click", () => {
+  .addEventListener(
+    "click",
+    () => {
 
-    document
-      .querySelector(".sidebar")
-      .classList.toggle("show");
+      document
+        .querySelector(".sidebar")
+        .classList.toggle(
+          "show"
+        );
 
-  });
+    }
+  );
 
 
-/* INITIAL RENDER */
+/* START APP */
 
 renderDashboard();
